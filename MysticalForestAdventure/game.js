@@ -7,8 +7,17 @@ const app = new PIXI.Application({
 
 globalThis.__PIXI_APP__ = app;
 
-// loading all assets
+// All text Style Properties
+const fontProperties = {
+  enterText: {
+    fontFamily: "Arial",
+    fontSize: 40,
+    fill: 0xffffff,
+    align: "left",
+  },
+};
 
+// loading all assets
 const assetsList = ["assets/1x/preloaderAssets.json"];
 
 PIXI.Assets.load(assetsList).then(() => {
@@ -30,6 +39,7 @@ function createSplashScreen(rootContainer) {
   const preloaderConatiner = new PIXI.Container();
   preloaderConatiner.name = "preloaderConatiner";
   rootContainer.addChild(preloaderConatiner);
+  preloaderConatiner.interactive = false
 
   // create background for splash screen
   const preloaderBg = new PIXI.Sprite(
@@ -83,14 +93,33 @@ function createSplashScreen(rootContainer) {
 
   loadingText.x = loadingBarContainer.width / 2 - loadingText.width / 2 + 150;
   loadingText.y = loadingBarContainer.height / 2 - loadingText.height / 2 + 70;
+  
+  const enterText = new PIXI.Text("PRESS ANYWHERE TO CONTINUE", fontProperties.enterText);
+  enterText.name = "enterText"
+  loadingBarContainer.addChild(enterText)
+  enterText.x = loadingBarContainer.width / 2 - enterText.width / 2 + 450;
+  enterText.y = loadingBarContainer.height / 2 - enterText.height / 2 + 100;
+  enterText.anchor.x = 0.5
+  enterText.anchor.y = 0.5
+  enterText.visible = false
 
-  loadingBarFill.width = 0
-  TweenMax.to(loadingBarFill,2, {
+  loadingBarFill.width = 0;
+  TweenMax.to(loadingBarFill, 2, {
     width: loadingBarEmpty.width, // The final width to fill the bar
     ease: "power1.inOut", // Optional ease
     onComplete: () => {
       console.error("2. Loading Complete");
-      
-    }
+      enterText.visible = true
+      loadingText.visible = false
+    },
   });
+  TweenMax.to(enterText.scale, 0.5, {
+    x: 1.1,
+    y: 1.1,
+    ease: "power1.none",
+    delay: 2,
+    repeat: -1,
+    yoyo: true,
+  })
+  preloaderConatiner.interactive = true
 }
